@@ -8,15 +8,20 @@ export function makeApp(db: Db): core.Express {
   const app = express();
   const jsonParser = bodyParser.json();
 
+// ***************************** Homepage ************************************************************
+app.get("/", async (request: Request, response: Response) => {
+  response.render("index.html");
+})
+
+// ****************************** GET PLATFORMS *******************************************************
   app.get("/platforms", async (request: Request, response: Response) => {
     const platformList = await db.collection("platforms").find().toArray();
     response.json(platformList);
   });
 
+  // ****************************** GET PLATFORMS SLUG *******************************************************
   app.get("/platforms/:slug", async (request: Request, response: Response) => {
-    const platform = await db
-      .collection("platforms")
-      .findOne({ slug: request.params.slug });
+    const platform = await db.collection("platforms").findOne({ slug: request.params.slug });
 
     if (platform) {
       response.json(platform);
@@ -25,10 +30,8 @@ export function makeApp(db: Db): core.Express {
     }
   });
 
-  app.post(
-    "/platforms",
-    jsonParser,
-    async (request: Request, response: Response) => {
+  // ****************************** POST PLATFORMS *******************************************************
+  app.post("/platforms", jsonParser, async (request: Request, response: Response) => {
       const errors = [];
       if (!request.body.name) {
         errors.push("name");
@@ -39,9 +42,7 @@ export function makeApp(db: Db): core.Express {
           .json({ error: "Missing required fields", missing: errors });
       }
 
-      const platform = await db
-        .collection("platforms")
-        .findOne({ name: request.body.name });
+      const platform = await db.collection("platforms").findOne({ name: request.body.name });
 
       if (platform) {
         return response
@@ -63,10 +64,8 @@ export function makeApp(db: Db): core.Express {
     }
   );
 
-  app.put(
-    "/platforms/:slug",
-    jsonParser,
-    async (request: Request, response: Response) => {
+// ****************************** PUT PLATFORMS *******************************************************
+  app.put("/platforms/:slug", jsonParser, async (request: Request, response: Response) => {
       const errors = [];
       if (!request.body.name) {
         errors.push("name");
@@ -93,6 +92,7 @@ export function makeApp(db: Db): core.Express {
     }
   );
 
+// ****************************** DELETE PLATFORMS *******************************************************
   app.delete(
     "/platforms/:slug",
     jsonParser,
@@ -110,9 +110,8 @@ export function makeApp(db: Db): core.Express {
     }
   );
 
-  app.get(
-    "/platforms/:slug/games",
-    async (request: Request, response: Response) => {
+// ****************************** GET PLATFORMS SLUG GAMES *******************************************************
+  app.get("/platforms/:slug/games", async (request: Request, response: Response) => {
       const games = await db
         .collection("games")
         .find({ platform_slug: request.params.slug })
@@ -121,11 +120,13 @@ export function makeApp(db: Db): core.Express {
     }
   );
 
+// ****************************** GET GAMES *******************************************************
   app.get("/games", async (request: Request, response: Response) => {
     const games = await db.collection("games").find().toArray();
     response.json(games);
   });
 
+// ****************************** GET GAMES SLUG *******************************************************
   app.get("/games/:slug", async (request: Request, response: Response) => {
     const game = await db.collection("games").findOne({
       slug: request.params.slug,
@@ -137,10 +138,8 @@ export function makeApp(db: Db): core.Express {
     }
   });
 
-  app.post(
-    "/games",
-    jsonParser,
-    async (request: Request, response: Response) => {
+// ****************************** POST GAMES *******************************************************
+  app.post("/games", jsonParser, async (request: Request, response: Response) => {
       const errors = [];
       if (!request.body.name) {
         errors.push("name");
@@ -184,6 +183,7 @@ export function makeApp(db: Db): core.Express {
     }
   );
 
+// ****************************** DELETE GAMES *******************************************************
   app.delete("/games/:slug", async (request: Request, response: Response) => {
     const game = await db
       .collection("games")
@@ -197,10 +197,8 @@ export function makeApp(db: Db): core.Express {
     }
   });
 
-  app.put(
-    "/games/:slug",
-    jsonParser,
-    async (request: Request, response: Response) => {
+// ****************************** PUT GAMES *******************************************************
+  app.put("/games/:slug", jsonParser, async (request: Request, response: Response) => {
       const errors = [];
       if (!request.body.name) {
         errors.push("name");
