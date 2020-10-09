@@ -9,8 +9,8 @@ export function makeApp(db: Db): core.Express {
   const jsonParser = bodyParser.json();
 
 // ***************************** Homepage ************************************************************
-app.get("/", async (request: Request, response: Response) => {
-  response.render("index.html");
+app.get("/", (request: Request, response: Response) => {
+   response.json("index.html");
 })
 
 // ****************************** GET PLATFORMS *******************************************************
