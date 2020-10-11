@@ -3,20 +3,29 @@ import bodyParser from "body-parser";
 import * as core from "express-serve-static-core";
 import slugify from "slug";
 import { Db } from "mongodb";
+const twig = require("twig");
+
 
 export function makeApp(db: Db): core.Express {
   const app = express();
   const jsonParser = bodyParser.json();
 
+  app.set("views", "views");
+  app.set("view engine", "twig");
+  app.engine("html", twig.__express);
+
+  
+
 // ***************************** Homepage ************************************************************
 app.get("/", (request: Request, response: Response) => {
-   response.json("index.html");
+   response.render("index.html.twig");
 })
 
 // ****************************** GET PLATFORMS *******************************************************
   app.get("/platforms", async (request: Request, response: Response) => {
     const platformList = await db.collection("platforms").find().toArray();
-    response.json(platformList);
+    console.log(platformList)
+    response.render("platforms/platforms.html.twig", {platformList : platformList});
   });
 
   // ****************************** GET PLATFORMS SLUG *******************************************************
@@ -230,6 +239,8 @@ app.get("/", (request: Request, response: Response) => {
     console.error(error);
     next();
   });
+
+  app.use(express.static('public'));
 
   return app;
 }
